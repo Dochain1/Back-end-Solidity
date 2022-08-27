@@ -14,13 +14,18 @@ describe("Dochain", function () {
   })
   it("checking the hash", async function () {
     const [adminlawyer, lawyerVisit] = await ethers.getSigners()
-    dochain = await DochainFactory.deploy(
-      adminlawyer.address,
-      lawyerVisit.address
-    )
+    const interval = 200;
     let hash: string =
       "0x50dcd166c37f57c44f54074a8dabff23f3ee602c20ac8db4242a813c26c464cd"
     const sig = await adminlawyer.signMessage(hash)
+    dochain = await DochainFactory.deploy(
+      adminlawyer.address,
+      lawyerVisit.address,
+      interval,
+      sig
+    )
+    
+    
 
     let currentValue: boolean = await dochain.readDocumentation(hash,sig)
     expect(currentValue).to.equal(true)

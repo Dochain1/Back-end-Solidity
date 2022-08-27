@@ -4,10 +4,18 @@ async function main() {
   const DochainFactory = await ethers.getContractFactory("Dochain")
   console.log("Deploying contract . . .")
   const [adminlawyer, lawyerVisit] = await ethers.getSigners()
+  const interval = 200;
+  const hash ="https://gateway.pinata.cloud/ipfs/QmUTPbs79BgYNmHJSsQrEhawE7mCYtvnv99bqbz911Y54k"
+  const message = await adminlawyer.signMessage(hash)
+  
+
   const Dochain = await DochainFactory.deploy(
     adminlawyer.address,
-    lawyerVisit.address
+    lawyerVisit.address,
+    interval,
+    message
   )
+
   await Dochain.deployed()
 
   if (network.config.chainId === 5 && process.env.ETHERSCAN_API_KEY) {
@@ -20,12 +28,10 @@ async function main() {
    * Sing Document
    * bytes32 _message, bytes memory _sign)
    */
-  const hash =
-    "0x50dcd166c37f57c44f54074a8dabff23f3ee602c20ac8db4242a813c26c464cd"
-  const sig = await adminlawyer.signMessage(hash)
+  // Tomar del json de ipfs y sacar el message
 
-  let value: boolean = await Dochain.readDocumentation(hash, sig)
-  console.log(`The Key is ${value}`)
+  // let value: boolean = await Dochain.readDocumentation(hash, sig)
+  // console.log(`The Key is ${value}`)
 }
 
 const verify = async (ContractAddress: string, args: any[]) => {

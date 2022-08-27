@@ -7,10 +7,10 @@ import "@typechain/hardhat"
 import "@nomiclabs/hardhat-ethers"
 import "dotenv/config"
 
-const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL
-const PRIVATE_KEY = process.env.PRIVATE_KEY
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY
+const { GOERLI_RPC_URL: GOERLI_RPC_URL, 
+        PRIVATE_KEY: PRIVATE_KEY,
+        ETHERSCAN_API_KEY:ETHERSCAN_API_KEY,
+        COINMARKETCAP_API_KEY:COINMARKETCAP_API_KEY } = process.env
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",

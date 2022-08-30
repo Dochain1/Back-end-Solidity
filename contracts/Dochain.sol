@@ -10,174 +10,203 @@ import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 
 error Dochain__VerifyFailed();
 
-contract Dochain is
-  AccessControl,
-  Pausable,
-  ERC721URIStorage,
-  KeeperCompatibleInterface
-{
-  using ECDSA for bytes32;
-  using Counters for Counters.Counter;
+/** @title Dochain Contract
+ * @author pinajmr
+ * @notice Briefcase decentralized
+ * @dev This implements the Chainlink Keppers and Openzeppelin library
+ */
 
-  Counters.Counter public tokenIdCounter;
-  // Role
-  bytes32 public constant ROL_ADMIN = keccak256("ROL_ADMIN");
-  bytes32 public constant ROL_VISITOR = keccak256("ROL_VISITOR");
+contract Dochain is AccessControl, Pausable, ERC721URIStorage, KeeperCompatibleInterface {
+    /* Type declarations */
+    using ECDSA for bytes32;
+    using Counters for Counters.Counter;
 
-  // Evento for add and delete role
-  event AddRole(address indexed lawyer);
-  event DeleteRole(address indexed lawyer);
-  event NewHash(string indexed newHash);
-  event MintSuccess(uint256, string indexed newNFT);
-  event TriggerHash(uint256, string indexed newHash);
+    Counters.Counter public tokenIdCounter;
 
-  uint256 lastTimeStamp;
-  uint256 interval;
+    /* Declarer roles */
+    bytes32 public constant ROL_ADMIN = keccak256("ROL_ADMIN");
+    bytes32 public constant ROL_VISITOR = keccak256("ROL_VISITOR");
 
-  string public ipfsUri;
-  string public newHash;
+    /* State Variable*/
+    // Dochain variables
+    string private s_hash;
+    string private s_newHash;
+    uint256 private s_lastTimeStamp;
+    uint256 private immutable i_interval;
 
-  constructor(
-    address _adminlawyer,
-    address _lawyerVisitor,
-    uint256 _interval,
-    string memory _ipfsUri
-  ) ERC721("Briefcase", "BC") {
-    // Role assignment
-    _grantRole(ROL_ADMIN, _msgSender());
-    _grantRole(ROL_ADMIN, _adminlawyer);
-    _grantRole(ROL_VISITOR, _lawyerVisitor);
-    interval = _interval;
-    lastTimeStamp = block.timestamp;
-    ipfsUri = _ipfsUri;
-  }
+    /* Events */
+    event AddRole(address indexed lawyer);
+    event DeleteRole(address indexed lawyer);
+    event NewHash(string indexed newHash);
+    event MintSuccess(uint256, string indexed newNFT);
+    event TriggerHash(uint256, string indexed newHash);
 
-  // Verify
-  function readDocumentation(bytes32 _message, bytes memory _sign)
-    public
-    view
-    onlyRole(ROL_ADMIN)
-    whenNotPaused
-    returns (bool)
-  {
-    if (_verify(_message, _sign, _msgSender())) {
-      revert Dochain__VerifyFailed();
+    constructor(
+        address[] memory adminlawyer,
+        address[] memory lawyerVisitor,
+        uint256 interval,
+        string memory hashs
+    ) ERC721("Briefcase", "BC") {
+        // Role assignment
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+
+        for (uint8 i = 0; i < adminlawyer.length; i++) {
+            _grantRole(ROL_ADMIN, adminlawyer[i]);
+        }
+
+        for (uint8 i = 0; i < lawyerVisitor.length; i++) {
+            _grantRole(ROL_VISITOR, lawyerVisitor[i]);
+        }
+
+        i_interval = interval;
+        s_lastTimeStamp = block.timestamp;
+        s_hash = hashs;
     }
-    return true;
-  }
 
-  // Insert new change
-  function newHashDocumentation(string memory _newHash)
-    public
-    whenNotPaused
-    onlyRole(ROL_ADMIN)
-  {
-    newHash = _newHash;
-    emit NewHash(_newHash);
-  }
-
-  function checkUpkeep(
-    bytes calldata /* checkData */
-  )
-    external
-    view
-    override
-    returns (
-      bool upkeepNeeded,
-      bytes memory /* performData */
+    /**
+     * @dev This is the function that the Chainlink Keeper nodes call
+     * they look for `upkeepNeeded` to return True.
+     * the following should be true for this to return true:
+     * 1. The time interval has passed 1 week
+     * 2. The hashes have to be different
+     * 3. The subscription is funded with LINK.
+     */
+    function checkUpkeep(
+        bytes calldata /* checkData */
     )
-  {
-    upkeepNeeded = ((block.timestamp - lastTimeStamp) > interval);
-  }
-
-  function performUpkeep(
-    bytes calldata /* performData */
-  ) external override {
-    if ((block.timestamp - lastTimeStamp) > interval) {
-      lastTimeStamp = block.timestamp;
-      uint256 tokenId = tokenIdCounter.current() - 1;
-      ipfsUri = newHash;
-      _setTokenURI(tokenId, ipfsUri);
-      emit TriggerHash(tokenId, ipfsUri);
+        external
+        view
+        override
+        returns (
+            bool upkeepNeeded,
+            bytes memory /* performData */
+        )
+    {
+        bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
+        bool chageHash = _compareStrings(s_hash, s_newHash);
+        upkeepNeeded = (timePassed && !chageHash);
     }
-  }
 
-  function safeMint(address to) public whenNotPaused onlyRole(ROL_VISITOR) {
-    uint256 tokenId = tokenIdCounter.current();
-    tokenIdCounter.increment();
-    _safeMint(to, tokenId);
-    _setTokenURI(tokenId, ipfsUri);
-    emit MintSuccess(tokenId, ipfsUri);
-  }
+    /**
+     * @dev Once `checkUpkeep` is returning `true`, this function is called
+     * and old hash is change for new one.
+     */
+    function performUpkeep(
+        bytes calldata /* performData */
+    ) external override {
+        if ((block.timestamp - s_lastTimeStamp) > i_interval) {
+            s_lastTimeStamp = block.timestamp;
+            uint256 tokenId = tokenIdCounter.current() - 1;
+            s_hash = s_newHash;
+            _setTokenURI(tokenId, s_hash);
+            emit TriggerHash(tokenId, s_hash);
+        }
+    }
 
-  function tokenURI(uint256 tokenId)
-    public
-    view
-    override(ERC721URIStorage)
-    onlyRole(ROL_VISITOR)
-    returns (string memory)
-  {
-    return super.tokenURI(tokenId);
-  }
+    function readDocumentation(bytes32 message, bytes memory sign)
+        public
+        view
+        onlyRole(ROL_VISITOR)
+        whenNotPaused
+        returns (bool)
+    {
+        if (_verify(message, sign, _msgSender())) {
+            revert Dochain__VerifyFailed();
+        }
+        return true;
+    }
 
-  // add role for visitor
-  function addRolevisitor(address _newlawyerVisitor)
-    public
-    onlyRole(ROL_ADMIN)
-    whenNotPaused
-  {
-    _grantRole(ROL_VISITOR, _newlawyerVisitor);
-    emit AddRole(_newlawyerVisitor);
-  }
+    // Insert new change
+    function newHashDocumentation(string memory newHash) public whenNotPaused onlyRole(ROL_ADMIN) {
+        s_newHash = newHash;
+        emit NewHash(s_newHash);
+    }
 
-  // delete role
-  function deleteRoleVisit(address _lawyerVisitor)
-    public
-    onlyRole(ROL_ADMIN)
-    whenNotPaused
-  {
-    _revokeRole(ROL_VISITOR, _lawyerVisitor);
-    emit DeleteRole(_lawyerVisitor);
-  }
+    function safeMint(address to) public whenNotPaused onlyRole(ROL_VISITOR) {
+        uint256 tokenId = tokenIdCounter.current();
+        tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, s_hash);
+        emit MintSuccess(tokenId, s_hash);
+    }
 
-  /// Verification function with signature
-  function _verify(
-    bytes32 data,
-    bytes memory signature,
-    address account
-  ) internal pure returns (bool) {
-    return data.toEthSignedMessageHash().recover(signature) == account;
-  }
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721URIStorage)
+        onlyRole(ROL_VISITOR)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
 
-  function _beforeTokenTransfer(
-    address from,
-    address to,
-    uint256 tokenId
-  ) internal override(ERC721) whenNotPaused {
-    super._beforeTokenTransfer(from, to, tokenId);
-  }
+    function addRole(address newLawyer, bytes32 role) public onlyRole(ROL_ADMIN) whenNotPaused {
+        _grantRole(role, newLawyer);
+        emit AddRole(newLawyer);
+    }
 
-  /**
-   * Apply function Pausable
-   */
-  function pause() public onlyRole(ROL_ADMIN) {
-    _pause();
-  }
+    function deleteRoleVisit(address lawyerVisitor) public onlyRole(ROL_ADMIN) whenNotPaused {
+        _revokeRole(ROL_VISITOR, lawyerVisitor);
+        emit DeleteRole(lawyerVisitor);
+    }
 
-  function unpause() public onlyRole(ROL_ADMIN) {
-    _unpause();
-  }
+    function pause() public onlyRole(ROL_ADMIN) {
+        _pause();
+    }
 
-  function _burn(uint256 tokenId) internal override(ERC721URIStorage) {
-    super._burn(tokenId);
-  }
+    function unpause() public onlyRole(ROL_ADMIN) {
+        _unpause();
+    }
 
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    override(ERC721, AccessControl)
-    returns (bool)
-  {
-    return super.supportsInterface(interfaceId);
-  }
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, AccessControl)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    /* Internal Functions*/
+    /// Verification function with signature
+    function _verify(
+        bytes32 data,
+        bytes memory signature,
+        address account
+    ) internal pure returns (bool) {
+        return data.toEthSignedMessageHash().recover(signature) == account;
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721) whenNotPaused {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function _compareStrings(string memory a, string memory b) internal pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
+    /* Getter functions */
+    function getActualHash() public view returns (string memory) {
+        return s_hash;
+    }
+
+    function getNewHash() public view returns (string memory) {
+        return s_newHash;
+    }
+
+    function getlastTimeStamp() public view returns (uint256) {
+        return s_lastTimeStamp;
+    }
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
+    }
 }

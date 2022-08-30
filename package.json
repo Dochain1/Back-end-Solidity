@@ -1,9 +1,8 @@
 {
   "name": "dochain",
   "version": "1.0.0",
-  "main": "index.js",
   "repository": "https://github.com/Dochain1/Back-end-Solidity.git",
-  "author": "pinajmr <pinajoma0@gmail.com>",
+  "author": "pinajmr <josepina@pinalikefrui.com>",
   "license": "MIT",
   "devDependencies": {
     "@chainlink/contracts": "^0.4.1",
@@ -20,17 +19,25 @@
     "@types/chai": "^4.2.0",
     "@types/mocha": "^9.1.0",
     "@types/node": ">=12.0.0",
+    "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "dotenv": "^16.0.1",
     "ethers": "^5.4.7",
     "hardhat": "^2.10.2",
+    "hardhat-contract-sizer": "^2.6.1",
+    "hardhat-deploy": "^0.11.12",
+    "hardhat-deploy-ethers": "^0.3.0-beta.13",
     "hardhat-gas-reporter": "^1.0.8",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.24",
+    "solhint": "^3.3.7",
     "solidity-coverage": "^0.7.21",
     "ts-node": ">=8.0.0",
     "typechain": "^8.1.0",
     "typescript": ">=4.5.0"
   },
   "scripts": {
+    "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.ts",
     "test-staging": "hardhat test --network goerli",
@@ -38,6 +45,6 @@
     "lint:fix": "solhint 'contracts/**/*.sol' --fix",
     "format": "prettier --write .",
     "coverage": "hardhat coverage",
-    "typechain": "yarn hardhat typechain"
+    "typechain": "hardhat typechain"
   }
 }

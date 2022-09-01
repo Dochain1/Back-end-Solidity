@@ -49,7 +49,7 @@ contract Dochain is AccessControl, Pausable, ERC721URIStorage, KeeperCompatibleI
     ) ERC721("Briefcase", "BC") {
         // Role assignment
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-
+        _setupRole(ROL_ADMIN, _msgSender());
         for (uint8 i = 0; i < adminlawyer.length; i++) {
             _grantRole(ROL_ADMIN, adminlawyer[i]);
         }
@@ -61,6 +61,7 @@ contract Dochain is AccessControl, Pausable, ERC721URIStorage, KeeperCompatibleI
         i_interval = interval;
         s_lastTimeStamp = block.timestamp;
         s_hash = hashs;
+        s_newHash = hashs;
     }
 
     /**
@@ -117,7 +118,7 @@ contract Dochain is AccessControl, Pausable, ERC721URIStorage, KeeperCompatibleI
     }
 
     // Insert new change
-    function newHashDocumentation(string memory newHash) public whenNotPaused onlyRole(ROL_ADMIN) {
+    function setNewHash(string memory newHash) public whenNotPaused onlyRole(ROL_ADMIN) {
         s_newHash = newHash;
         emit NewHash(s_newHash);
     }

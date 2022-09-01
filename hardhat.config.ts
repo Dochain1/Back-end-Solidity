@@ -7,6 +7,7 @@ import "@typechain/hardhat"
 import "@nomiclabs/hardhat-ethers"
 import "dotenv/config"
 import "hardhat-deploy"
+require("@nomicfoundation/hardhat-chai-matchers")
 
 const { GOERLI_RPC_URL: GOERLI_RPC_URL, 
         PRIVATE_KEY: PRIVATE_KEY,

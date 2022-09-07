@@ -24,14 +24,13 @@ describe("Dochain", function () {
     lawyerAdmin = accounts[1]
     const keyPublicAdmin =[accounts[0].address,lawyerAdmin.address] 
     const keyPublicVisit =[lawyerVisit.address]
-    interval = 200;
+    interval = 86400;
     let message: string = await hash(lawyerVisit)
     
 
     dochain = await DochainFactory.deploy(
     keyPublicAdmin,
     keyPublicVisit,
-    interval,
     message
     )
     await dochain.deployed() 
@@ -40,7 +39,7 @@ describe("Dochain", function () {
   describe("constructor", function () {
     it("checking the interval", async function () {
         const intervalValue = (await dochain.getInterval()).toString()
-        assert.equal(intervalValue, "200")
+        assert.equal(intervalValue, "86400")
     })
     it("lastTimeStam", async function() {
         expect(await dochain.getlastTimeStamp()).to.above(0);
@@ -61,7 +60,7 @@ describe("Dochain", function () {
   describe("checkUpkeep", function() {
     it("return false if enough time hasn't passed", async()=> {
         await dochain.setNewHash("00000x")
-        await network.provider.send("evm_increaseTime", [interval - 1])
+        await network.provider.send("evm_increaseTime", [interval - 200])
         await network.provider.request({method: "evm_mine", params: []})
         const { upkeepNeeded} = await dochain.callStatic.checkUpkeep("0x")
         assert(!upkeepNeeded)

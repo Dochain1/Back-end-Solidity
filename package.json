@@ -39,7 +39,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts",
+    "deploy": "hardhat run scripts/01-deploy-dochain.ts --network goerli",
     "test-staging": "hardhat test --network goerli",
     "lint": "solhint 'contracts/*.sol'",
     "lint:fix": "solhint 'contracts/**/*.sol' --fix",

@@ -7,14 +7,12 @@ async function deployContract() {
   console.log("Deploying contract . . .")
   const [lawyerAdmin] = await ethers.getSigners()
   const lawyerVisit = lawyerAdmin;
-  const interval = 200;
   let message = await hash(lawyerVisit)
   
   
   const args: any[] = [
     keyPublicAdmin,
     keyPublicVisit,
-    interval,
     message  
   ]
   
@@ -22,7 +20,6 @@ async function deployContract() {
   const Dochain = await DochainFactory.deploy(
     keyPublicAdmin,
     keyPublicVisit,
-    interval,
     message
   )
 

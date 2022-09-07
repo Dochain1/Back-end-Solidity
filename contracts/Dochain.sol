@@ -11,7 +11,7 @@ import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 error Dochain__VerifyFailed();
 
 /** @title Dochain Contract
- * @author pinajmr
+ * @author José Piña
  * @notice Briefcase decentralized
  * @dev This implements the Chainlink Keppers and Openzeppelin library
  */
@@ -44,7 +44,6 @@ contract Dochain is AccessControl, Pausable, ERC721URIStorage, KeeperCompatibleI
     constructor(
         address[] memory adminlawyer,
         address[] memory lawyerVisitor,
-        uint256 interval,
         string memory hashs
     ) ERC721("Briefcase", "BC") {
         // Role assignment
@@ -58,7 +57,7 @@ contract Dochain is AccessControl, Pausable, ERC721URIStorage, KeeperCompatibleI
             _grantRole(ROL_VISITOR, lawyerVisitor[i]);
         }
 
-        i_interval = interval;
+        i_interval = 1 days;
         s_lastTimeStamp = block.timestamp;
         s_hash = hashs;
         s_newHash = hashs;

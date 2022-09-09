@@ -1,5 +1,5 @@
 [![MIT License][license-shield]][license-url]
-
+<a name="readme-top"></a>
     
 <br />
 <div align="center">
@@ -140,6 +140,7 @@ Test Coverage:
 Distribuido bajo la licencia MIT. Consulte `LICENSE.txt` para obtener más información.
 
 <p align="right">(<a href="#readme-top">devuelta arriba</a>)</p>
+
 ## Autores
 
 👤 **José Piña**
@@ -147,33 +148,6 @@ Distribuido bajo la licencia MIT. Consulte `LICENSE.txt` para obtener más infor
 - GitHub: [@pinajmr](https://github.com/pinajmr)
 - Twitter: [@pinajmr]( https://twitter.com/pinajmr)
 - LinkedIn: [José Piña](https://www.linkedin.com/in/pinajmr/)
-
-👤 **Ivy Rocabado**
-
-- GitHub: [@IvySaskia](https://github.com/IvySaskia)
-- LinkedIn: [Ivy Rocabado](https://www.linkedin.com/in/ivy-rocabado/)
-
-👤 **Alberto Silva Cazares**
-
-- GitHub: [@Alberto-SC](https://github.com/Alberto-SC)
-
-👤 **Bárbaro Javier Valmaseda**
-
-- GitHub: [@bjvalmaseda-dev](https://github.com/bjvalmaseda-dev)
-- LinkedIn: [Bárbaro Javaier Valmaseda](https://linkedin/.com/in/bjvalmaseda)
-- Twitter [@bjvalmaseda](https://twitter.com/bjvalmaseda)
-
-👤 **Rodrigo Ramos**
-
-- GitHub: [@rdr-x](https://github.com/rdr-x)
-- Twitter: [@rdrx_](https://twitter.com/rdrx_)
-- LinkedIn: [Rodrigo Ramos](https://www.linkedin.com/in/rodrx20/)
-
-👤 **Sergio Valadez**
-
-- GitHub: [@sergiogval](https://github.com/sergiogval)
-- Twitter: [@twitterhandle](https://twitter.com/sgvldz)
-- LinkedIn: [Sergio Valadez](https://linkedin.com/in/linkedinhandle)
 
 
 <p align="right">(<a href="#readme-top">devuelta arriba</a>)</p>
